@@ -1,0 +1,8 @@
+/* Line.module.css */
+.container {
+  width: 1px;
+  height: 3px;
+  background-color: black;
+  position: absolute;
+  margin: 1px;
+}

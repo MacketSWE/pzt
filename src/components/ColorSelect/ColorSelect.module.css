@@ -1,0 +1,23 @@
+.container {
+  height: 30px;
+  width: 30px;
+  color: #5383ec;
+  margin-right: 18px;
+  border-radius: 15px;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.15s ease-in-out;
+}
+
+.container:hover {
+  transform: scale(1.1);
+}
+
+.container:active {
+  transform: scale(0.8);
+}
+
+.active,
+.active:hover {
+  transform: scale(0.9);
+}

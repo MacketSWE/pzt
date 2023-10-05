@@ -1,0 +1,76 @@
+import React, { useState } from "react";
+import styles from "./Zing.module.css";
+import { Line as ZingLine } from "./ZingAnimation";
+import { Line as SwirlLine } from "./SwirlAnimation";
+import { Line as PulseLine } from "./PulseAnimation";
+import { Line as VortexLine } from "./VortexAnimation";
+import { Line as MagnetLine } from "./MagnetAnimation";
+import { useAppStore } from "../../store/store";
+
+export enum AnimationType {
+  ZING,
+  SWIRL,
+  PULSE,
+  VORTEX,
+  MAGNET,
+}
+
+interface ZingProps {
+  animation: AnimationType;
+}
+
+export const Zing: React.FC<ZingProps> = ({ animation }) => {
+  const color = useAppStore((state) => state.color);
+
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+
+  const handleMouseMove = (event: React.MouseEvent) => {
+    const containerBounds = event.currentTarget.getBoundingClientRect();
+    const relativeX = event.clientX - containerBounds.left;
+    const relativeY = event.clientY - containerBounds.top;
+
+    setMousePosition({ x: relativeX, y: relativeY });
+  };
+
+  const spacing = 30;
+  const lineSizeWithMargin = 5;
+  const rows = Math.floor(800 / spacing);
+  const columns = Math.floor(1200 / spacing);
+
+  let LineComponent: any; // Determining which Line component to use based on the animation prop
+  switch (animation) {
+    case AnimationType.ZING:
+      LineComponent = ZingLine;
+      break;
+    case AnimationType.SWIRL:
+      LineComponent = SwirlLine;
+      break;
+    case AnimationType.PULSE:
+      LineComponent = PulseLine; // Using the Pulse Line for PULSE animation
+      break;
+    case AnimationType.VORTEX:
+      LineComponent = VortexLine; // Using the Pulse Line for PULSE animation
+      break;
+    case AnimationType.MAGNET:
+      LineComponent = MagnetLine; // Using the Pulse Line for PULSE animation
+      break;
+    default:
+      LineComponent = ZingLine;
+  }
+
+  return (
+    <div className={styles.container} onMouseMove={handleMouseMove}>
+      {Array.from({ length: rows }).flatMap((_, rowIndex) =>
+        Array.from({ length: columns }).map((_, colIndex) => (
+          <LineComponent
+            color={color.color}
+            key={`${rowIndex}-${colIndex}`}
+            x={15 + colIndex * spacing - (spacing - lineSizeWithMargin) / 2}
+            y={15 + rowIndex * spacing - (spacing - lineSizeWithMargin) / 2}
+            mousePosition={mousePosition}
+          />
+        ))
+      )}
+    </div>
+  );
+};

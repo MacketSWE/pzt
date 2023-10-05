@@ -1,0 +1,9 @@
+/* Zing.module.css */
+.container {
+  background-color: #242424;
+  border-radius: 10px;
+  overflow: hidden;
+  height: 755px;
+  width: 1177px;
+  position: relative;
+}

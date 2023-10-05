@@ -1,0 +1,18 @@
+.container {
+  display: flex;
+  align-items: center;
+  background-color: #78788014;
+  padding: 12px 29px;
+  border-radius: 20px;
+  margin: 26px 0;
+}
+
+.buttons {
+  display: flex;
+  align-items: center;
+  margin-left: 18px;
+}
+
+.text {
+  font-weight: 600;
+}
