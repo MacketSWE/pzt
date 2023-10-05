@@ -12,7 +12,7 @@ interface MousePointerProps {
 export const MousePointer: React.FC<MousePointerProps> = ({
   x,
   y,
-  color = "black",
+  color = "transparent",
   size = 20,
 }) => {
   return (
@@ -31,7 +31,6 @@ export const MousePointer: React.FC<MousePointerProps> = ({
 
 const Logo = () => {
   const c = useAppStore((state) => state.color);
-  console.log(c, "<--");
   return (
     <svg
       width="359"
