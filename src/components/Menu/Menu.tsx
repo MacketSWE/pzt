@@ -36,23 +36,20 @@ export const Menu = ({ selected, setSelected }: Props) => {
           text="Swirl 2"
         />
       </div>
-      {selected !== "Pulse" && (
-        <>
-          <Text>Color</Text>
-          <div className={styles.buttons}>
-            {pztColors.map((c) => {
-              return (
-                <ColorSelect
-                  color={c.color}
-                  active={color.name === c.name}
-                  onClick={() => setColor(c)}
-                  text={c.name}
-                />
-              );
-            })}
-          </div>
-        </>
-      )}
+
+      <Text>Color</Text>
+      <div className={styles.buttons}>
+        {pztColors.map((c) => {
+          return (
+            <ColorSelect
+              color={c.color}
+              active={color.name === c.name}
+              onClick={() => setColor(c)}
+              text={c.name}
+            />
+          );
+        })}
+      </div>
     </div>
   );
 };

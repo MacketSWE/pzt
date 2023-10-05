@@ -34,8 +34,8 @@ export const Zing: React.FC<ZingProps> = ({ animation }) => {
 
   const spacing = 30;
   const lineSizeWithMargin = 5;
-  const rows = Math.floor(800 / spacing);
-  const columns = Math.floor(1200 / spacing);
+  const rows = Math.floor(1200 / spacing);
+  const columns = Math.floor(1500 / spacing);
 
   let LineComponent: any; // Determining which Line component to use based on the animation prop
   switch (animation) {
@@ -65,8 +65,8 @@ export const Zing: React.FC<ZingProps> = ({ animation }) => {
           <LineComponent
             color={color.color}
             key={`${rowIndex}-${colIndex}`}
-            x={15 + colIndex * spacing - (spacing - lineSizeWithMargin) / 2}
-            y={15 + rowIndex * spacing - (spacing - lineSizeWithMargin) / 2}
+            x={-200 + colIndex * spacing - (spacing - lineSizeWithMargin) / 2}
+            y={-200 + rowIndex * spacing - (spacing - lineSizeWithMargin) / 2}
             mousePosition={mousePosition}
           />
         ))
