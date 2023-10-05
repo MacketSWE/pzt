@@ -6,6 +6,7 @@ import { Line as PulseLine } from "./PulseAnimation";
 import { Line as VortexLine } from "./VortexAnimation";
 import { Line as MagnetLine } from "./MagnetAnimation";
 import { useAppStore } from "../../store/store";
+import { MousePointer } from "./MousePointer";
 
 export enum AnimationType {
   ZING,
@@ -37,7 +38,7 @@ export const Zing: React.FC<ZingProps> = ({ animation }) => {
   const rows = Math.floor(1200 / spacing);
   const columns = Math.floor(1500 / spacing);
 
-  let LineComponent: any; // Determining which Line component to use based on the animation prop
+  let LineComponent: any;
   switch (animation) {
     case AnimationType.ZING:
       LineComponent = ZingLine;
@@ -46,13 +47,13 @@ export const Zing: React.FC<ZingProps> = ({ animation }) => {
       LineComponent = SwirlLine;
       break;
     case AnimationType.PULSE:
-      LineComponent = PulseLine; // Using the Pulse Line for PULSE animation
+      LineComponent = PulseLine;
       break;
     case AnimationType.VORTEX:
-      LineComponent = VortexLine; // Using the Pulse Line for PULSE animation
+      LineComponent = VortexLine;
       break;
     case AnimationType.MAGNET:
-      LineComponent = MagnetLine; // Using the Pulse Line for PULSE animation
+      LineComponent = MagnetLine;
       break;
     default:
       LineComponent = ZingLine;
@@ -71,6 +72,10 @@ export const Zing: React.FC<ZingProps> = ({ animation }) => {
           />
         ))
       )}
+      <MousePointer
+        x={mousePosition.x + window.pageXOffset}
+        y={mousePosition.y + window.pageYOffset}
+      />
     </div>
   );
 };

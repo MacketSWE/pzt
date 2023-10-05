@@ -27,6 +27,7 @@ function App() {
     <div className={styles.container}>
       <div className={styles.editor}>
         <Logo />
+
         <Menu selected={selected} setSelected={setSelected} />
         <Zing animation={getAnimation(selected)} />
       </div>
