@@ -1,4 +1,4 @@
-// Dot.tsx
+// Line.tsx
 import React from "react";
 import styles from "./Line.module.css";
 import { LineProps } from "../ZingAnimation/Line";
@@ -12,26 +12,47 @@ export const Line: React.FC<LineProps> = ({ x, y, mousePosition, color }) => {
   const theta = Math.atan2(mousePosition.y - y, mousePosition.x - x);
   const angleInDegrees = theta * (180 / Math.PI);
 
-  // Adjust position of dots based on their distance to the pointer, creating a pull effect
-  const pullEffect = 50 - distanceToMouse * 0.1;
-  const shiftedX = x - pullEffect * Math.cos(theta);
-  const shiftedY = y - pullEffect * Math.sin(theta);
+  // Adjust length based on distance
+  const adjustedLength = 20 - distanceToMouse * 0.01;
+  const length = Math.max(5, adjustedLength);
 
-  // Determine opacity to create void around pointer
-  const opacity = distanceToMouse < 10 ? 0 : 1; // Dots within 25 pixels of the pointer will be invisible
+  // Circle effect for dots close to the pointer
+  const circleRadius = 60;
+
+  // Adjust position based on circle effect, angle, and gravitational pull
+  let radialShift;
+  if (distanceToMouse < circleRadius) {
+    radialShift = (circleRadius - distanceToMouse) * 2;
+  } else {
+    radialShift = 0.1 * distanceToMouse;
+  }
+
+  const shiftedX = x + radialShift * Math.cos(theta);
+  const shiftedY = y + radialShift * Math.sin(theta);
+
+  // Additional attraction towards center point (x, y)
+  const attractionFactor = 0.1 * (1 - distanceToMouse / circleRadius);
+  const centerX = x + (shiftedX - x) * attractionFactor;
+  const centerY = y + (shiftedY - y) * attractionFactor;
+
+  // Adjust rotation based on distance
+  const adjustedRotation = angleInDegrees + distanceToMouse * 0.2;
+
+  // Adjust opacity for dots very close to the pointer
+  const opacity = distanceToMouse < 5 ? 0 : 1;
 
   return (
     <div
       className={styles.container}
       style={{
-        left: shiftedX,
-        top: shiftedY,
+        left: centerX,
+        top: centerY,
         width: `1px`,
-        height: `20px`,
-        transform: `rotate(${angleInDegrees}deg)`,
+        height: `${length}px`,
+        transform: `rotate(${adjustedRotation}deg)`,
         transformOrigin: "center",
-        backgroundColor: color,
         opacity: opacity,
+        backgroundColor: color,
       }}
     ></div>
   );

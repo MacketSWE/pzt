@@ -33,17 +33,7 @@ export const Menu = ({ selected, setSelected }: Props) => {
         <Button
           active={selected === "Vortex"}
           onClick={() => handleOnClick("Vortex")}
-          text="Alt 1"
-        />
-        <Button
-          active={selected === "Magnet"}
-          onClick={() => handleOnClick("Magnet")}
-          text="Alt 2"
-        />
-        <Button
-          active={selected === "Pulse"}
-          onClick={() => handleOnClick("Pulse")}
-          text="😈"
+          text="Swirl 2"
         />
       </div>
       {selected !== "Pulse" && (
