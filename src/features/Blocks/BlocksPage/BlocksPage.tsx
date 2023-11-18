@@ -5,7 +5,7 @@ import styles from "./BlocksPage.module.css";
 export const BlocksPage = () => {
   const [blockSize, setBlockSize] = useState(100);
   const [borderRadiusValue, setBorderRadiusValue] = useState(20);
-  const [timeoutDuration, setTimeoutDuration] = useState(1000);
+  const [timeoutDuration, setTimeoutDuration] = useState(300);
   const [activeBlocks, setActiveBlocks] = useState<Record<number, boolean>>({});
   const [blockColor, setBlockColor] = useState("#d7f3f5"); // Default color set to blue
   const [isSettingsMinimized, setIsSettingsMinimized] = useState(false);
@@ -162,8 +162,6 @@ const SettingsPanel = ({
   setBlockSize,
   borderRadiusValue,
   setBorderRadiusValue,
-  numOfBlocks,
-  setNumOfBlocks,
   timeoutDuration,
   setTimeoutDuration,
   blockColor,
@@ -183,7 +181,7 @@ const SettingsPanel = ({
             <input
               type="range"
               min="50"
-              max="200"
+              max="300"
               value={blockSize}
               onChange={(e) => setBlockSize(Number(e.target.value))}
             />{" "}
@@ -193,7 +191,7 @@ const SettingsPanel = ({
             <label>Border Radius: </label>
             <input
               type="range"
-              min="0"
+              min="10"
               max="50"
               value={borderRadiusValue}
               onChange={(e) => setBorderRadiusValue(Number(e.target.value))}
@@ -206,7 +204,7 @@ const SettingsPanel = ({
             <input
               type="range"
               min="100"
-              max="5000"
+              max="4000"
               step="100"
               value={timeoutDuration}
               onChange={(e) => setTimeoutDuration(Number(e.target.value))}
