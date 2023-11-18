@@ -88,10 +88,12 @@ const Block = ({
     index < numOfBlocks - columns && activeBlocks[index + columns];
 
   const borderRadius =
-    (isTopActive ? "0 " : "10px ") +
-    (isRightActive ? "0 " : "10px ") +
-    (isBottomActive ? "0 " : "10px ") +
-    (isLeftActive ? "0 " : "10px ");
+    `${isTopActive || isLeftActive ? "0" : "10px"} ${
+      isRightActive || isTopActive ? "0" : "10px"
+    } ` +
+    `${isBottomActive || isRightActive ? "0" : "10px"} ${
+      isLeftActive || isBottomActive ? "0" : "10px"
+    }`;
 
   return (
     <div
