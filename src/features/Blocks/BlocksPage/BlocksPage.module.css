@@ -4,13 +4,13 @@
   display: flex;
   flex-wrap: wrap;
   align-content: flex-start;
-  gap: px;
   position: fixed;
   height: 100vh;
   width: 100vw;
   margin: 0;
   padding: 0;
   background-color: #111314;
+  z-index: 100;
 }
 
 .block {
@@ -26,22 +26,22 @@
   /* transition: background-color 0.3s; Smooth transition for color change */
 }
 
-.greenCornerBottomRight::before {
+.cornerBottomRight::before {
   content: "";
   position: absolute;
-  width: 20px; /* Assume a fixed size for simplicity */
-  height: 20px;
+  width: 10px; /* Assume a fixed size for simplicity */
+  height: 10px;
   background-color: #d7f3f5;
   clip-path: polygon(100% 0, 0 100%, 100% 100%);
   right: 0;
   bottom: 0;
 }
 
-.greenCornerTopLeft::before {
+.cornerTopLeft::before {
   content: "";
   position: absolute;
-  width: 20px; /* Assume a fixed size for simplicity */
-  height: 20px;
+  width: 10px; /* Assume a fixed size for simplicity */
+  height: 10px;
   background-color: #d7f3f5;
   clip-path: polygon(0 100%, 100% 0, 0 0);
   left: 0;
@@ -50,18 +50,33 @@
 
 .settingsPanel {
   position: fixed;
-  top: 0;
-  left: 0;
+  top: 10px;
+  left: 10px;
   background-color: white;
   border: 1px solid #ccc;
-  border-radius: 4px;
-  padding: 10px;
-  z-index: 1000; /* Ensure the panel floats on top */
-  overflow: hidden; /* Hide the overflowing content */
-  transition: max-height 0.3s ease-in-out; /* Apply transition to max-height */
+  border-radius: 8px;
+  padding: 16px;
+  z-index: 1000;
+  overflow: hidden;
+  transition: max-height 0.3s ease-in-out;
+  font-family: "Arial", sans-serif; /* Set a nice font */
+  width: 400px; /* Set a fixed width */
 }
 
 .settingsPanel.minimized {
-  max-height: 1px; /* Set a max-height to accommodate the header */
+  max-height: 0px;
   padding: 0;
+  margin-top: -20px;
+}
+
+.settingsContent {
+  display: flex;
+  flex-direction: column;
+  gap: 10px; /* Add some space between the setting items */
+}
+
+.settingItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Align the label and input */
 }

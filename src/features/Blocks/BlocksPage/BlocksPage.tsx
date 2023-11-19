@@ -1,6 +1,8 @@
 // BlocksPage.tsx
 import React, { useEffect, useState } from "react";
 import styles from "./BlocksPage.module.css";
+import ReactPlayer from "react-player";
+import videoFile from "../assets/video.mp4";
 
 export const BlocksPage = () => {
   const [blockSize, setBlockSize] = useState(100);
@@ -11,6 +13,20 @@ export const BlocksPage = () => {
   const [isSettingsMinimized, setIsSettingsMinimized] = useState(false);
   const numOfBlocks = 1000;
 
+  const [containerBackgroundColor, setContainerBackgroundColor] =
+    useState("#111314");
+
+  const toggleBackgroundColor = () => {
+    setContainerBackgroundColor((prevColor) => {
+      if (prevColor === "#111314") {
+        return "#ffffff"; // Change to white
+      } else if (prevColor === "#ffffff") {
+        return "transparent"; // Change to transparent
+      } else {
+        return "#111314"; // Change back to dark color
+      }
+    });
+  };
   const toggleSettingsMinimize = (event: KeyboardEvent) => {
     if (event.key.toLowerCase() === "s") {
       setIsSettingsMinimized((prev) => !prev);
@@ -36,6 +52,7 @@ export const BlocksPage = () => {
   return (
     <div>
       <SettingsPanel
+        toggleBackgroundColor={toggleBackgroundColor}
         blockSize={blockSize}
         setBlockSize={setBlockSize}
         borderRadiusValue={borderRadiusValue}
@@ -47,7 +64,22 @@ export const BlocksPage = () => {
         setBlockColor={setBlockColor}
         isMinimized={isSettingsMinimized}
       />
-      <div className={styles.container}>
+      <div
+        style={{
+          zIndex: 50,
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "100vw",
+          height: "100vh",
+        }}
+      >
+        <ReactPlayer url={videoFile} playing width="100%" height="100%" loop />
+      </div>
+      <div
+        className={styles.container}
+        style={{ backgroundColor: containerBackgroundColor }}
+      >
         {blocksArray.map((_, index) => (
           <Block
             key={index}
@@ -95,8 +127,8 @@ const Block = ({
   const isBottomActive =
     index < numOfBlocks - columns && activeBlocks[index + columns];
 
-  const isGreenCornerBottomRight = !isActive && isRightActive && isBottomActive;
-  const isGreenCornerTopLeft = !isActive && isLeftActive && isTopActive;
+  const isCornerBottomRight = !isActive && isRightActive && isBottomActive;
+  const isCornerTopLeft = !isActive && isLeftActive && isTopActive;
 
   // Determine the index of the block to the right of the block on top
   const topBlockIndex = index - columns;
@@ -130,10 +162,10 @@ const Block = ({
     }`;
 
   let cornerClass = "";
-  if (isGreenCornerBottomRight) {
-    cornerClass = styles.greenCornerBottomRight;
-  } else if (isGreenCornerTopLeft) {
-    cornerClass = styles.greenCornerTopLeft;
+  if (isCornerBottomRight) {
+    cornerClass = styles.cornerBottomRight;
+  } else if (isCornerTopLeft) {
+    cornerClass = styles.cornerTopLeft;
   }
 
   let backgroundColor = "transparent";
@@ -167,6 +199,7 @@ const SettingsPanel = ({
   blockColor,
   setBlockColor,
   isMinimized,
+  toggleBackgroundColor,
 }: any) => {
   return (
     <div
@@ -175,8 +208,11 @@ const SettingsPanel = ({
       }`}
     >
       {!isMinimized && (
-        <div>
-          <div>
+        <div className={styles.settingsContent}>
+          <button onClick={toggleBackgroundColor}>
+            Toggle Background Color
+          </button>
+          <div className={styles.settingItem}>
             <label>Block Size: </label>
             <input
               type="range"
@@ -187,7 +223,7 @@ const SettingsPanel = ({
             />{" "}
             {blockSize} px
           </div>
-          <div>
+          <div className={styles.settingItem}>
             <label>Border Radius: </label>
             <input
               type="range"
@@ -199,7 +235,7 @@ const SettingsPanel = ({
             {borderRadiusValue} px
           </div>
 
-          <div>
+          <div className={styles.settingItem}>
             <label>Timeout Duration: </label>
             <input
               type="range"
@@ -211,7 +247,7 @@ const SettingsPanel = ({
             />{" "}
             {timeoutDuration} ms
           </div>
-          <div>
+          <div className={styles.settingItem}>
             <label>Block Color: </label>
             <input
               type="color"
