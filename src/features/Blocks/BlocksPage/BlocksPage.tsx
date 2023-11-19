@@ -1,8 +1,10 @@
 // BlocksPage.tsx
 import React, { useEffect, useState } from "react";
 import styles from "./BlocksPage.module.css";
-import ReactPlayer from "react-player";
-import videoFile from "../assets/video.mp4";
+
+interface CustomStyle extends React.CSSProperties {
+  "--block-color"?: string;
+}
 
 export const BlocksPage = () => {
   const [blockSize, setBlockSize] = useState(100);
@@ -20,8 +22,6 @@ export const BlocksPage = () => {
     setContainerBackgroundColor((prevColor) => {
       if (prevColor === "#111314") {
         return "#ffffff"; // Change to white
-      } else if (prevColor === "#ffffff") {
-        return "transparent"; // Change to transparent
       } else {
         return "#111314"; // Change back to dark color
       }
@@ -49,8 +49,12 @@ export const BlocksPage = () => {
     }, timeoutDuration);
   };
 
+  const blockStyle: CustomStyle = {
+    "--block-color": blockColor,
+  };
+
   return (
-    <div>
+    <div style={blockStyle}>
       <SettingsPanel
         toggleBackgroundColor={toggleBackgroundColor}
         blockSize={blockSize}
@@ -64,18 +68,6 @@ export const BlocksPage = () => {
         setBlockColor={setBlockColor}
         isMinimized={isSettingsMinimized}
       />
-      <div
-        style={{
-          zIndex: 50,
-          position: "fixed",
-          top: 0,
-          left: 0,
-          width: "100vw",
-          height: "100vh",
-        }}
-      >
-        <ReactPlayer url={videoFile} playing width="100%" height="100%" loop />
-      </div>
       <div
         className={styles.container}
         style={{ backgroundColor: containerBackgroundColor }}
@@ -184,7 +176,7 @@ const Block = ({
         height: `${size}px`,
         borderRadius,
         backgroundColor,
-      }} // Apply backgroundColor here
+      }}
     ></div>
   );
 };
@@ -209,9 +201,7 @@ const SettingsPanel = ({
     >
       {!isMinimized && (
         <div className={styles.settingsContent}>
-          <button onClick={toggleBackgroundColor}>
-            Toggle Background Color
-          </button>
+          <button onClick={toggleBackgroundColor}>Toggle Background</button>
           <div className={styles.settingItem}>
             <label>Block Size: </label>
             <input

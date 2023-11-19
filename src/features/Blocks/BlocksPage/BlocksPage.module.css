@@ -31,7 +31,7 @@
   position: absolute;
   width: 10px; /* Assume a fixed size for simplicity */
   height: 10px;
-  background-color: #d7f3f5;
+  background-color: var(--block-color);
   clip-path: polygon(100% 0, 0 100%, 100% 100%);
   right: 0;
   bottom: 0;
@@ -42,7 +42,7 @@
   position: absolute;
   width: 10px; /* Assume a fixed size for simplicity */
   height: 10px;
-  background-color: #d7f3f5;
+  background-color: var(--block-color);
   clip-path: polygon(0 100%, 100% 0, 0 0);
   left: 0;
   top: 0;
@@ -79,4 +79,21 @@
   display: flex;
   align-items: center;
   justify-content: space-between; /* Align the label and input */
+}
+
+.settingItem label {
+  width: 150px;
+}
+
+.settingsContent button {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #fafafa;
+  cursor: pointer;
+}
+
+.settingsContent button:hover {
+  background-color: #eee;
 }
