@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import styles from "./BlocksPage.module.css";
 
 export const BlocksPage = () => {
-  const [borderRadiusValue, setBorderRadiusValue] = useState(20);
-  const [timeoutDuration, setTimeoutDuration] = useState(300);
+  const [brv, setBorderRadiusValue] = useState(20);
+  const [timeoutDuration, setTimeoutDuration] = useState(30000);
   const [activeBlocks, setActiveBlocks] = useState<Record<number, boolean>>({});
   const [blockColor, setBlockColor] = useState("#d7f3f5");
   const [isSettingsMinimized, setIsSettingsMinimized] = useState(false);
@@ -45,7 +45,7 @@ export const BlocksPage = () => {
     <div>
       <SettingsPanel
         toggleBackgroundColor={toggleBackgroundColor}
-        borderRadiusValue={borderRadiusValue}
+        brv={brv}
         setBorderRadiusValue={setBorderRadiusValue}
         timeoutDuration={timeoutDuration}
         setTimeoutDuration={setTimeoutDuration}
@@ -65,7 +65,7 @@ export const BlocksPage = () => {
           <Block
             key={index}
             index={index}
-            borderRadiusValue={borderRadiusValue}
+            brv={brv}
             blockColor={blockColor}
             blocksPerRow={blocksPerRow}
             activeBlocks={activeBlocks}
@@ -81,7 +81,7 @@ export const BlocksPage = () => {
 type BlockProps = {
   index: number;
   blocksPerRow: number;
-  borderRadiusValue: number;
+  brv: number;
   blockColor: string;
   activeBlocks: Record<number, boolean>;
   onMouseEnter: (index: number) => void;
@@ -91,7 +91,7 @@ type BlockProps = {
 const Block = ({
   index,
   blocksPerRow,
-  borderRadiusValue,
+  brv,
   blockColor,
   activeBlocks,
   onMouseEnter,
@@ -103,19 +103,71 @@ const Block = ({
   const isTopBlockActive = activeBlocks[index - blocksPerRow];
   const isBottomBlockActive = activeBlocks[index + blocksPerRow];
 
+  const isTopLeftCornerActive = activeBlocks[index - blocksPerRow - 1];
+  const isTopRightCornerActive = activeBlocks[index - blocksPerRow + 1];
+  const isBottomLeftCornerActive = activeBlocks[index + blocksPerRow - 1];
+  const isBottomRightCornerActive = activeBlocks[index + blocksPerRow + 1];
+
+  const isFullHero =
+    !isActive &&
+    isTopBlockActive &&
+    isBottomBlockActive &&
+    isLeftBlockActive &&
+    isRightBlockActive;
+
+  const isTopLeftHero = !isActive && isTopBlockActive && isLeftBlockActive;
+
+  const isTopRightHero = !isActive && isTopBlockActive && isRightBlockActive;
+
+  const isBottomLeftHero =
+    !isActive && isBottomBlockActive && isLeftBlockActive;
+
+  const isBottomRightHero =
+    !isActive && isBottomBlockActive && isRightBlockActive;
+
+  let innerBackgroundColor;
+  let outerBackgroundColor;
   let borderRadius;
-  if (isActive) {
+
+  if (isFullHero) {
+    innerBackgroundColor = backgroundColor;
+    outerBackgroundColor = blockColor;
+    borderRadius = `${brv}px`;
+  } else if (
+    isTopLeftHero ||
+    isTopRightHero ||
+    isBottomLeftHero ||
+    isBottomRightHero
+  ) {
+    innerBackgroundColor = backgroundColor;
+    outerBackgroundColor = blockColor;
+    borderRadius = `${isTopLeftHero ? brv : 0}px ${
+      isTopRightHero ? brv : 0
+    }px ${isBottomRightHero ? brv : 0}px ${isBottomLeftHero ? brv : 0}px`;
+  } else if (isActive) {
+    innerBackgroundColor = blockColor;
+    outerBackgroundColor = backgroundColor;
     borderRadius = `${
-      isTopBlockActive || isLeftBlockActive ? "0" : `${borderRadiusValue}px`
+      isTopBlockActive || isLeftBlockActive || isTopLeftCornerActive
+        ? "0"
+        : `${brv}px`
     } ${
-      isRightBlockActive || isTopBlockActive ? "0" : `${borderRadiusValue}px`
+      isRightBlockActive || isTopBlockActive || isTopRightCornerActive
+        ? "0"
+        : `${brv}px`
     } ${
-      isBottomBlockActive || isRightBlockActive ? "0" : `${borderRadiusValue}px`
+      isBottomBlockActive || isRightBlockActive || isBottomRightCornerActive
+        ? "0"
+        : `${brv}px`
     } ${
-      isLeftBlockActive || isBottomBlockActive ? "0" : `${borderRadiusValue}px`
+      isLeftBlockActive || isBottomBlockActive || isBottomLeftCornerActive
+        ? "0"
+        : `${brv}px`
     }`;
   } else {
-    borderRadius = "0"; // If inactive, border-radius is 0
+    innerBackgroundColor = backgroundColor;
+    outerBackgroundColor = backgroundColor;
+    borderRadius = "0";
   }
 
   return (
@@ -123,12 +175,12 @@ const Block = ({
       className={styles.block}
       onMouseEnter={() => onMouseEnter(index)}
       style={{
-        backgroundColor: backgroundColor,
+        backgroundColor: outerBackgroundColor,
       }}
     >
       <div
         style={{
-          backgroundColor: isActive ? blockColor : backgroundColor,
+          backgroundColor: innerBackgroundColor,
           width: "100%",
           height: "100%",
           borderRadius: borderRadius,
@@ -139,7 +191,7 @@ const Block = ({
 };
 
 const SettingsPanel = ({
-  borderRadiusValue,
+  brv,
   setBorderRadiusValue,
   timeoutDuration,
   setTimeoutDuration,
@@ -165,10 +217,10 @@ const SettingsPanel = ({
               type="range"
               min="10"
               max="50"
-              value={borderRadiusValue}
+              value={brv}
               onChange={(e) => setBorderRadiusValue(Number(e.target.value))}
             />{" "}
-            {borderRadiusValue} px
+            {brv} px
           </div>
           <div className={styles.settingItem}>
             <label>Timeout Duration: </label>
