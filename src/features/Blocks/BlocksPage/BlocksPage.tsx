@@ -1,29 +1,21 @@
-// BlocksPage.tsx
 import React, { useEffect, useState } from "react";
 import styles from "./BlocksPage.module.css";
 
-interface CustomStyle extends React.CSSProperties {
-  "--block-color"?: string;
-}
-
 export const BlocksPage = () => {
-  const [blockSize, setBlockSize] = useState(100);
   const [borderRadiusValue, setBorderRadiusValue] = useState(20);
   const [timeoutDuration, setTimeoutDuration] = useState(300);
   const [activeBlocks, setActiveBlocks] = useState<Record<number, boolean>>({});
-  const [blockColor, setBlockColor] = useState("#d7f3f5"); // Default color set to blue
+  const [blockColor, setBlockColor] = useState("#d7f3f5");
   const [isSettingsMinimized, setIsSettingsMinimized] = useState(false);
-  const numOfBlocks = 1000;
-
-  const [containerBackgroundColor, setContainerBackgroundColor] =
-    useState("#111314");
+  const [blocksPerRow, setBlocksPerRow] = useState(10);
+  const [backgroundColor, setBackgroundColor] = useState("#111314");
 
   const toggleBackgroundColor = () => {
-    setContainerBackgroundColor((prevColor) => {
+    setBackgroundColor((prevColor) => {
       if (prevColor === "#111314") {
-        return "#ffffff"; // Change to white
+        return "#ffffff";
       } else {
-        return "#111314"; // Change back to dark color
+        return "#111314";
       }
     });
   };
@@ -40,7 +32,7 @@ export const BlocksPage = () => {
     };
   }, []);
 
-  const blocksArray = Array(numOfBlocks).fill(null);
+  const blocksArray = Array(1000).fill(null);
 
   const handleMouseEnter = (index: number) => {
     setActiveBlocks((prev) => ({ ...prev, [index]: true }));
@@ -49,39 +41,36 @@ export const BlocksPage = () => {
     }, timeoutDuration);
   };
 
-  const blockStyle: CustomStyle = {
-    "--block-color": blockColor,
-  };
-
   return (
-    <div style={blockStyle}>
+    <div>
       <SettingsPanel
         toggleBackgroundColor={toggleBackgroundColor}
-        blockSize={blockSize}
-        setBlockSize={setBlockSize}
         borderRadiusValue={borderRadiusValue}
         setBorderRadiusValue={setBorderRadiusValue}
-        numOfBlocks={numOfBlocks}
         timeoutDuration={timeoutDuration}
         setTimeoutDuration={setTimeoutDuration}
         blockColor={blockColor}
         setBlockColor={setBlockColor}
         isMinimized={isSettingsMinimized}
+        blocksPerRow={blocksPerRow}
+        setBlocksPerRow={setBlocksPerRow}
       />
       <div
         className={styles.container}
-        style={{ backgroundColor: containerBackgroundColor }}
+        style={{
+          gridTemplateColumns: `repeat(${blocksPerRow}, 1fr)`,
+        }}
       >
         {blocksArray.map((_, index) => (
           <Block
             key={index}
             index={index}
-            size={blockSize}
             borderRadiusValue={borderRadiusValue}
-            blockColor={blockColor} // Pass down the block color
-            numOfBlocks={numOfBlocks}
+            blockColor={blockColor}
+            blocksPerRow={blocksPerRow}
             activeBlocks={activeBlocks}
             onMouseEnter={handleMouseEnter}
+            backgroundColor={backgroundColor}
           />
         ))}
       </div>
@@ -91,99 +80,65 @@ export const BlocksPage = () => {
 
 type BlockProps = {
   index: number;
-  size: number;
-  numOfBlocks: number;
+  blocksPerRow: number;
   borderRadiusValue: number;
-  blockColor: string; // New prop for block color
+  blockColor: string;
   activeBlocks: Record<number, boolean>;
   onMouseEnter: (index: number) => void;
+  backgroundColor: string;
 };
 
 const Block = ({
   index,
-  size,
-  numOfBlocks,
+  blocksPerRow,
   borderRadiusValue,
-  blockColor, // Receive the block color prop
+  blockColor,
   activeBlocks,
   onMouseEnter,
+  backgroundColor,
 }: BlockProps) => {
-  const columns = Math.floor(window.innerWidth / size); // Assuming a full-width container
-
   const isActive = activeBlocks[index];
+  const isRightBlockActive = activeBlocks[index + 1];
+  const isLeftBlockActive = activeBlocks[index - 1];
+  const isTopBlockActive = activeBlocks[index - blocksPerRow];
+  const isBottomBlockActive = activeBlocks[index + blocksPerRow];
 
-  const isLeftActive = index % columns !== 0 && activeBlocks[index - 1];
-  const isRightActive =
-    index % columns !== columns - 1 && activeBlocks[index + 1];
-  const isTopActive = index >= columns && activeBlocks[index - columns];
-  const isBottomActive =
-    index < numOfBlocks - columns && activeBlocks[index + columns];
-
-  const isCornerBottomRight = !isActive && isRightActive && isBottomActive;
-  const isCornerTopLeft = !isActive && isLeftActive && isTopActive;
-
-  // Determine the index of the block to the right of the block on top
-  const topBlockIndex = index - columns;
-  const rightOfTopBlockIndex = topBlockIndex + 1;
-
-  // Determine the index of the block below
-  const belowBlockIndex = index + columns;
-  // Determine the index of the block to the left of the block below
-  const leftOfBelowBlockIndex = belowBlockIndex - 1;
-
-  // Check if the block to the right of the block on top is active
-  const isRightOfTopBlockActive =
-    topBlockIndex % columns !== columns - 1 && // Ensure the top block is not in the last column
-    activeBlocks[rightOfTopBlockIndex];
-
-  // Check if the block to the left of the block below is active
-  const isLeftOfBelowBlockActive =
-    belowBlockIndex % columns !== 0 && // Ensure the below block is not in the first column
-    activeBlocks[leftOfBelowBlockIndex];
-
-  const borderRadius =
-    `${isTopActive || isLeftActive ? "0" : `${borderRadiusValue}px`} ${
-      isRightActive || isTopActive || isRightOfTopBlockActive
-        ? "0"
-        : `${borderRadiusValue}px`
-    } ` +
-    `${isBottomActive || isRightActive ? "0" : `${borderRadiusValue}px`} ${
-      isLeftActive || isBottomActive || isLeftOfBelowBlockActive
-        ? "0"
-        : `${borderRadiusValue}px`
-    }`;
-
-  let cornerClass = "";
-  if (isCornerBottomRight) {
-    cornerClass = styles.cornerBottomRight;
-  } else if (isCornerTopLeft) {
-    cornerClass = styles.cornerTopLeft;
-  }
-
-  let backgroundColor = "transparent";
+  let borderRadius;
   if (isActive) {
-    backgroundColor = blockColor;
+    borderRadius = `${
+      isTopBlockActive || isLeftBlockActive ? "0" : `${borderRadiusValue}px`
+    } ${
+      isRightBlockActive || isTopBlockActive ? "0" : `${borderRadiusValue}px`
+    } ${
+      isBottomBlockActive || isRightBlockActive ? "0" : `${borderRadiusValue}px`
+    } ${
+      isLeftBlockActive || isBottomBlockActive ? "0" : `${borderRadiusValue}px`
+    }`;
+  } else {
+    borderRadius = "0"; // If inactive, border-radius is 0
   }
 
   return (
     <div
-      className={`${cornerClass} ${
-        isActive ? styles.activeBlock : styles.block
-      }`}
+      className={styles.block}
       onMouseEnter={() => onMouseEnter(index)}
       style={{
-        width: `${size}px`,
-        height: `${size}px`,
-        borderRadius,
-        backgroundColor,
+        backgroundColor: backgroundColor,
       }}
-    ></div>
+    >
+      <div
+        style={{
+          backgroundColor: isActive ? blockColor : backgroundColor,
+          width: "100%",
+          height: "100%",
+          borderRadius: borderRadius,
+        }}
+      ></div>
+    </div>
   );
 };
 
 const SettingsPanel = ({
-  blockSize,
-  setBlockSize,
   borderRadiusValue,
   setBorderRadiusValue,
   timeoutDuration,
@@ -192,6 +147,8 @@ const SettingsPanel = ({
   setBlockColor,
   isMinimized,
   toggleBackgroundColor,
+  blocksPerRow,
+  setBlocksPerRow,
 }: any) => {
   return (
     <div
@@ -203,17 +160,6 @@ const SettingsPanel = ({
         <div className={styles.settingsContent}>
           <button onClick={toggleBackgroundColor}>Toggle Background</button>
           <div className={styles.settingItem}>
-            <label>Block Size: </label>
-            <input
-              type="range"
-              min="50"
-              max="300"
-              value={blockSize}
-              onChange={(e) => setBlockSize(Number(e.target.value))}
-            />{" "}
-            {blockSize} px
-          </div>
-          <div className={styles.settingItem}>
             <label>Border Radius: </label>
             <input
               type="range"
@@ -224,7 +170,6 @@ const SettingsPanel = ({
             />{" "}
             {borderRadiusValue} px
           </div>
-
           <div className={styles.settingItem}>
             <label>Timeout Duration: </label>
             <input
@@ -243,6 +188,14 @@ const SettingsPanel = ({
               type="color"
               value={blockColor}
               onChange={(e) => setBlockColor(e.target.value)}
+            />
+          </div>
+          <div className={styles.settingItem}>
+            <label>Blocks per Row: </label>
+            <input
+              type="number"
+              value={blocksPerRow}
+              onChange={(e) => setBlocksPerRow(Number(e.target.value))}
             />
           </div>
         </div>

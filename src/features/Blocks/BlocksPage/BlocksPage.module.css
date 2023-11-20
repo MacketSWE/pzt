@@ -1,51 +1,30 @@
-/* BlocksPage.module.css */
-
 .container {
-  display: flex;
-  flex-wrap: wrap;
-  align-content: flex-start;
+  display: grid;
   position: fixed;
   height: 100vh;
   width: 100vw;
   margin: 0;
   padding: 0;
-  background-color: #111314;
   z-index: 100;
+  grid-auto-rows: 1fr;
 }
 
 .block {
-  position: relative; /* Ensure this is set to relative */
+  aspect-ratio: 1 / 1;
+  width: 100%;
+  position: relative;
   margin: 0;
   padding: 0;
+  background-color: #eee; /* Set a default background color */
 }
 
 .activeBlock {
-  background-color: #d7f3f5;
+  aspect-ratio: 1 / 1;
+  width: 100%;
   margin: 0;
   padding: 0;
-  /* transition: background-color 0.3s; Smooth transition for color change */
-}
-
-.cornerBottomRight::before {
-  content: "";
-  position: absolute;
-  width: 10px; /* Assume a fixed size for simplicity */
-  height: 10px;
-  background-color: var(--block-color);
-  clip-path: polygon(100% 0, 0 100%, 100% 100%);
-  right: 0;
-  bottom: 0;
-}
-
-.cornerTopLeft::before {
-  content: "";
-  position: absolute;
-  width: 10px; /* Assume a fixed size for simplicity */
-  height: 10px;
-  background-color: var(--block-color);
-  clip-path: polygon(0 100%, 100% 0, 0 0);
-  left: 0;
-  top: 0;
+  background-color: #eee; /* Set a default background color */
+  transition: background-color 0.3s;
 }
 
 .settingsPanel {
@@ -59,8 +38,8 @@
   z-index: 1000;
   overflow: hidden;
   transition: max-height 0.3s ease-in-out;
-  font-family: "Arial", sans-serif; /* Set a nice font */
-  width: 400px; /* Set a fixed width */
+  font-family: "Arial", sans-serif;
+  width: 400px;
 }
 
 .settingsPanel.minimized {
@@ -72,13 +51,13 @@
 .settingsContent {
   display: flex;
   flex-direction: column;
-  gap: 10px; /* Add some space between the setting items */
+  gap: 10px;
 }
 
 .settingItem {
   display: flex;
   align-items: center;
-  justify-content: space-between; /* Align the label and input */
+  justify-content: space-between;
 }
 
 .settingItem label {
