@@ -3,22 +3,14 @@ import styles from "./BlocksPage.module.css";
 
 export const BlocksPage = () => {
   const [brv, setBorderRadiusValue] = useState(20);
-  const [timeoutDuration, setTimeoutDuration] = useState(30000);
+  const [timeoutDuration, setTimeoutDuration] = useState(700);
   const [activeBlocks, setActiveBlocks] = useState<Record<number, boolean>>({});
   const [blockColor, setBlockColor] = useState("#d7f3f5");
   const [isSettingsMinimized, setIsSettingsMinimized] = useState(false);
-  const [blocksPerRow, setBlocksPerRow] = useState(10);
+  const [blocksPerRow, setBlocksPerRow] = useState(20);
   const [backgroundColor, setBackgroundColor] = useState("#111314");
+  const [isMouseVisible, setIsMouseVisible] = useState(true);
 
-  const toggleBackgroundColor = () => {
-    setBackgroundColor((prevColor) => {
-      if (prevColor === "#111314") {
-        return "#ffffff";
-      } else {
-        return "#111314";
-      }
-    });
-  };
   const toggleSettingsMinimize = (event: KeyboardEvent) => {
     if (event.key.toLowerCase() === "s") {
       setIsSettingsMinimized((prev) => !prev);
@@ -32,7 +24,7 @@ export const BlocksPage = () => {
     };
   }, []);
 
-  const blocksArray = Array(1000).fill(null);
+  const blocksArray = Array(2000).fill(null);
 
   const handleMouseEnter = (index: number) => {
     setActiveBlocks((prev) => ({ ...prev, [index]: true }));
@@ -42,9 +34,13 @@ export const BlocksPage = () => {
   };
 
   return (
-    <div>
+    <div
+      style={{
+        cursor: isMouseVisible ? "auto" : "none", // Set cursor style based on isMouseVisible state
+      }}
+    >
       <SettingsPanel
-        toggleBackgroundColor={toggleBackgroundColor}
+        setBackgroundColor={setBackgroundColor}
         brv={brv}
         setBorderRadiusValue={setBorderRadiusValue}
         timeoutDuration={timeoutDuration}
@@ -54,6 +50,8 @@ export const BlocksPage = () => {
         isMinimized={isSettingsMinimized}
         blocksPerRow={blocksPerRow}
         setBlocksPerRow={setBlocksPerRow}
+        isMouseVisible={isMouseVisible}
+        setIsMouseVisible={setIsMouseVisible}
       />
       <div
         className={styles.container}
@@ -198,9 +196,11 @@ const SettingsPanel = ({
   blockColor,
   setBlockColor,
   isMinimized,
-  toggleBackgroundColor,
+  setBackgroundColor,
   blocksPerRow,
   setBlocksPerRow,
+  isMouseVisible,
+  setIsMouseVisible,
 }: any) => {
   return (
     <div
@@ -210,7 +210,29 @@ const SettingsPanel = ({
     >
       {!isMinimized && (
         <div className={styles.settingsContent}>
-          <button onClick={toggleBackgroundColor}>Toggle Background</button>
+          <div className={styles.settingItem}>
+            <label>Show Mouse Pointer: </label>
+            <input
+              type="checkbox"
+              checked={isMouseVisible}
+              onChange={() => setIsMouseVisible((prev: any) => !prev)}
+            />
+          </div>
+          <div className={styles.settingItem}>
+            <label>Background Color: </label>
+            <input
+              type="color"
+              onChange={(e) => setBackgroundColor(e.target.value)}
+            />
+          </div>
+          <div className={styles.settingItem}>
+            <label>Block Color: </label>
+            <input
+              type="color"
+              value={blockColor}
+              onChange={(e) => setBlockColor(e.target.value)}
+            />
+          </div>
           <div className={styles.settingItem}>
             <label>Border Radius: </label>
             <input
@@ -234,21 +256,18 @@ const SettingsPanel = ({
             />{" "}
             {timeoutDuration} ms
           </div>
-          <div className={styles.settingItem}>
-            <label>Block Color: </label>
-            <input
-              type="color"
-              value={blockColor}
-              onChange={(e) => setBlockColor(e.target.value)}
-            />
-          </div>
+
           <div className={styles.settingItem}>
             <label>Blocks per Row: </label>
             <input
-              type="number"
+              type="range"
+              min="5"
+              max="30"
+              step="5"
               value={blocksPerRow}
               onChange={(e) => setBlocksPerRow(Number(e.target.value))}
-            />
+            />{" "}
+            {blocksPerRow}
           </div>
         </div>
       )}
