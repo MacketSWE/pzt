@@ -16,10 +16,33 @@ export const BlocksPage = () => {
   const [isMouseVisible, setIsMouseVisible] = useState(true);
   const [isPaintMode, setIsPaintMode] = useState(false);
   const [randomSpeed, setRandomSpeed] = useState(50);
+  const [isMouseDown, setIsMouseDown] = useState(false);
 
   const toggleSettingsMinimize = (event: KeyboardEvent) => {
     if (event.key.toLowerCase() === "s") {
       setIsSettingsMinimized((prev) => !prev);
+    }
+  };
+
+  const handleMouseDown = () => {
+    if (isPaintMode) {
+      setIsMouseDown(true);
+    }
+  };
+
+  const handleMouseUp = () => {
+    setIsMouseDown(false);
+  };
+
+  const handleMouseEnter = (index: number) => {
+    if (isPaintMode && isMouseDown) {
+      setActiveBlocks((prev) => ({ ...prev, [index]: true }));
+    }
+    if (!isPaintMode) {
+      setActiveBlocks((prev) => ({ ...prev, [index]: true }));
+      setTimeout(() => {
+        setActiveBlocks((prev) => ({ ...prev, [index]: false }));
+      }, timeoutDuration);
     }
   };
 
@@ -104,16 +127,17 @@ export const BlocksPage = () => {
     };
   }, []);
 
-  const blocksArray = Array(2000).fill(null);
+  useEffect(() => {
+    window.addEventListener("mousedown", handleMouseDown);
+    window.addEventListener("mouseup", handleMouseUp);
 
-  const handleMouseEnter = (index: number) => {
-    if (!isPaintMode) {
-      setActiveBlocks((prev) => ({ ...prev, [index]: true }));
-      setTimeout(() => {
-        setActiveBlocks((prev) => ({ ...prev, [index]: false }));
-      }, timeoutDuration);
-    }
-  };
+    return () => {
+      window.removeEventListener("mousedown", handleMouseDown);
+      window.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [isPaintMode]);
+
+  const blocksArray = Array(2000).fill(null);
 
   const handleBlockClick = (index: number) => {
     if (isPaintMode) {
