@@ -1,21 +1,75 @@
+// BlocksPage.tsx
+
 import React, { useEffect, useState } from "react";
 import styles from "./BlocksPage.module.css";
+import { ColorSelect } from "../../../components/ColorSelect";
+import { pztColors } from "../../../store/store";
 
 export const BlocksPage = () => {
   const [brv, setBorderRadiusValue] = useState(20);
   const [timeoutDuration, setTimeoutDuration] = useState(700);
   const [activeBlocks, setActiveBlocks] = useState<Record<number, boolean>>({});
-  const [blockColor, setBlockColor] = useState("#d7f3f5");
+  const [blockColor, setBlockColor] = useState("#4285F4");
   const [isSettingsMinimized, setIsSettingsMinimized] = useState(false);
   const [blocksPerRow, setBlocksPerRow] = useState(20);
-  const [backgroundColor, setBackgroundColor] = useState("#111314");
+  const [backgroundColor, setBackgroundColor] = useState("#000000");
   const [isMouseVisible, setIsMouseVisible] = useState(true);
+  const [isPaintMode, setIsPaintMode] = useState(false);
+  const [randomSpeed, setRandomSpeed] = useState(50);
 
   const toggleSettingsMinimize = (event: KeyboardEvent) => {
     if (event.key.toLowerCase() === "s") {
       setIsSettingsMinimized((prev) => !prev);
     }
   };
+
+  const randomiseBlocks = () => {
+    const newActiveBlocks: Record<number, boolean> = {};
+    blocksArray.forEach((_, index) => {
+      newActiveBlocks[index] = true;
+    });
+    setActiveBlocks(newActiveBlocks);
+    setIsSettingsMinimized(true);
+    setIsPaintMode(true);
+
+    // Deactivate blocks after a random delay
+    Object.keys(newActiveBlocks).forEach((index) => {
+      setTimeout(() => {
+        setActiveBlocks((prev) => ({ ...prev, [index]: false }));
+      }, 1000 + Math.random() * randomSpeed); // Random delay between 2 to 5 seconds
+    });
+
+    // Reset blocks after a random delay
+    setTimeout(() => {
+      setIsPaintMode(false);
+      setIsSettingsMinimized(false);
+    }, 3000 + randomSpeed);
+  };
+
+  const handleEscPress = (event: KeyboardEvent) => {
+    if (event.key === "Escape" && isPaintMode) {
+      const activeBlockIndices = Object.keys(activeBlocks)
+        .filter((key: any) => activeBlocks[key])
+        .map((key) => parseInt(key));
+
+      // Shuffle the indices array
+      activeBlockIndices.sort(() => Math.random() - 0.5);
+
+      // Disappear blocks with random timing
+      activeBlockIndices.forEach((index) => {
+        setTimeout(() => {
+          setActiveBlocks((prev) => ({ ...prev, [index.toString()]: false }));
+        }, 200 + Math.random() * 500);
+      });
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener("keydown", handleEscPress);
+    return () => {
+      window.removeEventListener("keydown", handleEscPress);
+    };
+  }, [activeBlocks, isPaintMode, randomSpeed]);
 
   useEffect(() => {
     window.addEventListener("keydown", toggleSettingsMinimize);
@@ -27,10 +81,21 @@ export const BlocksPage = () => {
   const blocksArray = Array(2000).fill(null);
 
   const handleMouseEnter = (index: number) => {
-    setActiveBlocks((prev) => ({ ...prev, [index]: true }));
-    setTimeout(() => {
-      setActiveBlocks((prev) => ({ ...prev, [index]: false }));
-    }, timeoutDuration);
+    if (!isPaintMode) {
+      setActiveBlocks((prev) => ({ ...prev, [index]: true }));
+      setTimeout(() => {
+        setActiveBlocks((prev) => ({ ...prev, [index]: false }));
+      }, timeoutDuration);
+    }
+  };
+
+  const handleBlockClick = (index: number) => {
+    if (isPaintMode) {
+      setActiveBlocks((prev) => ({
+        ...prev,
+        [index]: !prev[index], // Toggle the block's active state
+      }));
+    }
   };
 
   return (
@@ -50,13 +115,18 @@ export const BlocksPage = () => {
         isMinimized={isSettingsMinimized}
         blocksPerRow={blocksPerRow}
         setBlocksPerRow={setBlocksPerRow}
+        backgroundColor={backgroundColor}
         isMouseVisible={isMouseVisible}
         setIsMouseVisible={setIsMouseVisible}
+        isPaintMode={isPaintMode}
+        setIsPaintMode={setIsPaintMode}
+        onRandomiseClick={randomiseBlocks}
       />
       <div
         className={styles.container}
         style={{
           gridTemplateColumns: `repeat(${blocksPerRow}, 1fr)`,
+          gridTemplateRows: `repeat(auto-fill, ${100 / blocksPerRow}vw)`,
         }}
       >
         {blocksArray.map((_, index) => (
@@ -68,6 +138,7 @@ export const BlocksPage = () => {
             blocksPerRow={blocksPerRow}
             activeBlocks={activeBlocks}
             onMouseEnter={handleMouseEnter}
+            onMouseClick={handleBlockClick}
             backgroundColor={backgroundColor}
           />
         ))}
@@ -83,6 +154,7 @@ type BlockProps = {
   blockColor: string;
   activeBlocks: Record<number, boolean>;
   onMouseEnter: (index: number) => void;
+  onMouseClick: (index: number) => void;
   backgroundColor: string;
 };
 
@@ -93,6 +165,7 @@ const Block = ({
   blockColor,
   activeBlocks,
   onMouseEnter,
+  onMouseClick,
   backgroundColor,
 }: BlockProps) => {
   const isActive = activeBlocks[index];
@@ -146,7 +219,10 @@ const Block = ({
     innerBackgroundColor = blockColor;
     outerBackgroundColor = backgroundColor;
     borderRadius = `${
-      isTopBlockActive || isLeftBlockActive || isTopLeftCornerActive
+      isTopBlockActive ||
+      isLeftBlockActive ||
+      isTopLeftCornerActive ||
+      index === 0
         ? "0"
         : `${brv}px`
     } ${
@@ -158,7 +234,10 @@ const Block = ({
         ? "0"
         : `${brv}px`
     } ${
-      isLeftBlockActive || isBottomBlockActive || isBottomLeftCornerActive
+      isLeftBlockActive ||
+      isBottomBlockActive ||
+      isBottomLeftCornerActive ||
+      index === 0
         ? "0"
         : `${brv}px`
     }`;
@@ -172,6 +251,7 @@ const Block = ({
     <div
       className={styles.block}
       onMouseEnter={() => onMouseEnter(index)}
+      onClick={() => onMouseClick(index)}
       style={{
         backgroundColor: outerBackgroundColor,
       }}
@@ -201,6 +281,10 @@ const SettingsPanel = ({
   setBlocksPerRow,
   isMouseVisible,
   setIsMouseVisible,
+  isPaintMode,
+  setIsPaintMode,
+  onRandomiseClick,
+  backgroundColor,
 }: any) => {
   return (
     <div
@@ -211,6 +295,17 @@ const SettingsPanel = ({
       {!isMinimized && (
         <div className={styles.settingsContent}>
           <div className={styles.settingItem}>
+            <button onClick={onRandomiseClick}>Randomise</button>
+          </div>
+          <div className={styles.settingItem}>
+            <label>Draw: </label>
+            <input
+              type="checkbox"
+              checked={isPaintMode}
+              onChange={() => setIsPaintMode((prev: any) => !prev)}
+            />
+          </div>
+          <div className={styles.settingItem}>
             <label>Show Mouse Pointer: </label>
             <input
               type="checkbox"
@@ -218,20 +313,36 @@ const SettingsPanel = ({
               onChange={() => setIsMouseVisible((prev: any) => !prev)}
             />
           </div>
+
           <div className={styles.settingItem}>
             <label>Background Color: </label>
-            <input
-              type="color"
-              onChange={(e) => setBackgroundColor(e.target.value)}
-            />
+            <div className={styles.buttons}>
+              {pztColors.map((c) => {
+                return (
+                  <ColorSelect
+                    color={c.color}
+                    active={backgroundColor === c.color}
+                    onClick={() => setBackgroundColor(c.color)}
+                    text={c.name}
+                  />
+                );
+              })}
+            </div>
           </div>
           <div className={styles.settingItem}>
             <label>Block Color: </label>
-            <input
-              type="color"
-              value={blockColor}
-              onChange={(e) => setBlockColor(e.target.value)}
-            />
+            <div className={styles.buttons}>
+              {pztColors.map((c) => {
+                return (
+                  <ColorSelect
+                    color={c.color}
+                    active={blockColor === c.color}
+                    onClick={() => setBlockColor(c.color)}
+                    text={c.name}
+                  />
+                );
+              })}
+            </div>
           </div>
           <div className={styles.settingItem}>
             <label>Border Radius: </label>
@@ -256,9 +367,8 @@ const SettingsPanel = ({
             />{" "}
             {timeoutDuration} ms
           </div>
-
           <div className={styles.settingItem}>
-            <label>Blocks per Row: </label>
+            <label>Block size: </label>
             <input
               type="range"
               min="5"
@@ -267,10 +377,11 @@ const SettingsPanel = ({
               value={blocksPerRow}
               onChange={(e) => setBlocksPerRow(Number(e.target.value))}
             />{" "}
-            {blocksPerRow}
+            {35 - blocksPerRow}
           </div>
         </div>
       )}
+      <div className={styles.minimizedText}>Toggle menu with "S" button</div>
     </div>
   );
 };

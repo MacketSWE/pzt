@@ -1,6 +1,6 @@
 import create from "zustand";
 
-type pColor = "Yellow" | "Red" | "Green" | "Blue" | "White";
+type pColor = "Yellow" | "Red" | "Green" | "Blue" | "White" | "Black";
 
 interface pztColor {
   name: pColor;
@@ -8,6 +8,7 @@ interface pztColor {
 }
 
 export const pztColors: pztColor[] = [
+  { name: "Black", color: "#000000" },
   { name: "Yellow", color: "#F2BF42" },
   { name: "Red", color: "#D65342" },
   { name: "Green", color: "#58A65C" },

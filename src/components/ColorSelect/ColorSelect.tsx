@@ -8,13 +8,15 @@ interface Props {
 export const ColorSelect = ({ text, onClick, active, color }: Props) => {
   const activeStyle = active ? styles.active : "";
 
+  console.log("color", color);
   return (
     <div
       onClick={onClick}
       className={`${styles.container} ${activeStyle}`}
       style={{
         backgroundColor: color,
-        border: color === "white" ? `1px solid lightgray` : "",
+        border:
+          color === "#FFFFFF" ? `1px solid lightgray` : `1px sold ${color}`,
       }}
     ></div>
   );
