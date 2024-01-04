@@ -6,6 +6,7 @@ import { ColorSelect } from "../../../components/ColorSelect";
 import { pztColors } from "../../../store/store";
 
 export const BlocksPage = () => {
+  const [dissolveStyle, setDissolveStyle] = useState("Random");
   const [brv, setBorderRadiusValue] = useState(20);
   const [timeoutDuration, setTimeoutDuration] = useState(700);
   const [activeBlocks, setActiveBlocks] = useState<Record<number, boolean>>({});
@@ -15,7 +16,7 @@ export const BlocksPage = () => {
   const [backgroundColor, setBackgroundColor] = useState("#000000");
   const [isMouseVisible, setIsMouseVisible] = useState(true);
   const [isPaintMode, setIsPaintMode] = useState(false);
-  const [randomSpeed, setRandomSpeed] = useState(50);
+  const [randomSpeed, setRandomSpeed] = useState(1000);
   const [isMouseDown, setIsMouseDown] = useState(false);
 
   const toggleSettingsMinimize = (event: KeyboardEvent) => {
@@ -55,18 +56,33 @@ export const BlocksPage = () => {
     setIsSettingsMinimized(true);
     setIsPaintMode(true);
 
-    // Deactivate blocks after a random delay
-    Object.keys(newActiveBlocks).forEach((index) => {
+    Object.keys(newActiveBlocks).forEach((key) => {
+      const index = parseInt(key);
+      let delay;
+
+      if (dissolveStyle === "Random") {
+        delay = 200 + Math.random() * randomSpeed;
+      } else if (dissolveStyle === "Top-Down") {
+        const rowIndex = Math.floor(index / blocksPerRow) + 1;
+        delay = rowIndex * (100 + Math.random() * 50) + 200;
+        console.log(rowIndex, delay);
+      } else if (dissolveStyle === "Down-Top") {
+        const totalRows = Math.ceil(blocksArray.length / blocksPerRow);
+        const rowIndex = totalRows - Math.floor(index / blocksPerRow);
+        delay = rowIndex * (100 + Math.random() * 50);
+      }
+
       setTimeout(() => {
         setActiveBlocks((prev) => ({ ...prev, [index]: false }));
-      }, 1000 + Math.random() * randomSpeed); // Random delay between 2 to 5 seconds
+      }, delay);
     });
 
-    // Reset blocks after a random delay
+    // Reset blocks after the longest possible delay
+    const maxDelay = 3000 + randomSpeed; // Adjust this based on your dissolve style timing
     setTimeout(() => {
       setIsPaintMode(false);
       setIsSettingsMinimized(false);
-    }, 3000 + randomSpeed);
+    }, maxDelay);
   };
 
   const handleEscPress = (event: KeyboardEvent) => {
@@ -137,7 +153,24 @@ export const BlocksPage = () => {
     };
   }, [isPaintMode]);
 
-  const blocksArray = Array(2000).fill(null);
+  let amount;
+  switch (blocksPerRow) {
+    case 20:
+      amount = 300;
+      break;
+    case 15:
+      amount = 200;
+      break;
+    case 10:
+      amount = 100;
+      break;
+    case 5:
+      amount = 50;
+      break;
+    default:
+      amount = 1000;
+  }
+  const blocksArray = Array(amount).fill(null);
 
   const handleBlockClick = (index: number) => {
     if (isPaintMode) {
@@ -171,6 +204,8 @@ export const BlocksPage = () => {
         isPaintMode={isPaintMode}
         setIsPaintMode={setIsPaintMode}
         onRandomiseClick={randomiseBlocks}
+        dissolveStyle={dissolveStyle}
+        setDissolveStyle={setDissolveStyle}
       />
       <div
         className={styles.container}
@@ -335,6 +370,8 @@ const SettingsPanel = ({
   setIsPaintMode,
   onRandomiseClick,
   backgroundColor,
+  dissolveStyle,
+  setDissolveStyle,
 }: any) => {
   return (
     <div
@@ -345,8 +382,44 @@ const SettingsPanel = ({
       {!isMinimized && (
         <div className={styles.settingsContent}>
           <div className={styles.settingItem}>
-            <button onClick={onRandomiseClick}>Randomise</button>
+            <button onClick={onRandomiseClick}>Dissolve screen</button>
           </div>
+          <div className={styles.settingItem}>
+            <label>Dissolve Animation Style:</label>
+            <div>
+              <div>
+                <input
+                  type="radio"
+                  value="Random"
+                  name="dissolveStyle"
+                  checked={dissolveStyle === "Random"}
+                  onChange={() => setDissolveStyle("Random")}
+                />{" "}
+                Random
+              </div>
+              <div>
+                <input
+                  type="radio"
+                  value="Top-Down"
+                  name="dissolveStyle"
+                  checked={dissolveStyle === "Top-Down"}
+                  onChange={() => setDissolveStyle("Top-Down")}
+                />{" "}
+                Top-Down
+              </div>
+              <div>
+                <input
+                  type="radio"
+                  value="Down-Top"
+                  name="dissolveStyle"
+                  checked={dissolveStyle === "Down-Top"}
+                  onChange={() => setDissolveStyle("Down-Top")}
+                />{" "}
+                Down-Top
+              </div>
+            </div>
+          </div>
+
           <div className={styles.settingItem}>
             <label>Draw: </label>
             <input
