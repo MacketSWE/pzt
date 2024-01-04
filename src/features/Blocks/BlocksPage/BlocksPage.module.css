@@ -85,8 +85,11 @@
   margin-left: 18px;
 }
 
+.miniText {
+  margin-top: 20px;
+}
 .minimizedText {
   font-size: 14px;
   color: #aaa;
-  margin-top: 20px;
+  margin-top: 8px;
 }

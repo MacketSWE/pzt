@@ -52,15 +52,41 @@ export const BlocksPage = () => {
         .filter((key: any) => activeBlocks[key])
         .map((key) => parseInt(key));
 
+      let longestTimeoutDuration = 0;
+
       // Shuffle the indices array
       activeBlockIndices.sort(() => Math.random() - 0.5);
 
-      // Disappear blocks with random timing
+      // Disappear blocks with random timing and track the longest duration
       activeBlockIndices.forEach((index) => {
+        const timeoutDuration = 200 + Math.random() * 500;
+        longestTimeoutDuration = Math.max(
+          longestTimeoutDuration,
+          timeoutDuration
+        );
+
         setTimeout(() => {
           setActiveBlocks((prev) => ({ ...prev, [index.toString()]: false }));
-        }, 200 + Math.random() * 500);
+        }, timeoutDuration);
       });
+
+      // Restore blocks after the last one has disappeared plus 3 seconds
+      setTimeout(() => {
+        activeBlockIndices.forEach((index) => {
+          setActiveBlocks((prev) => ({ ...prev, [index.toString()]: true }));
+        });
+      }, longestTimeoutDuration + 1500);
+    } else if (isPaintMode && (event.key === "C" || event.key === "c")) {
+      // Clear all blocks immediately without animation
+      const clearedBlocks = Object.keys(activeBlocks).reduce(
+        (acc, key: any) => {
+          acc[key] = false;
+          return acc;
+        },
+        {} as Record<number, boolean>
+      );
+
+      setActiveBlocks(clearedBlocks);
     }
   };
 
@@ -381,7 +407,19 @@ const SettingsPanel = ({
           </div>
         </div>
       )}
-      <div className={styles.minimizedText}>Toggle menu with "S" button</div>
+      <div className={styles.miniText}>
+        <div className={styles.minimizedText}>Toggle menu with "S" button</div>
+        {isPaintMode && (
+          <>
+            <div className={styles.minimizedText}>
+              Press "C" to clear screen
+            </div>
+            <div className={styles.minimizedText}>
+              Press "Esc" to clear with animation + reset
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 };
