@@ -17,16 +17,7 @@
   position: relative;
   margin: 0;
   padding: 0;
-  background-color: #eee; /* Set a default background color */
-}
-
-.activeBlock {
-  aspect-ratio: 1 / 1;
-  width: 100%;
-  margin: 0;
-  padding: 0;
-  background-color: #eee; /* Set a default background color */
-  transition: background-color 0.3s;
+  background-color: #eee;
 }
 
 .settingsPanel {

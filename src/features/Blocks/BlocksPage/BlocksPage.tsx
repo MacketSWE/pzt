@@ -13,11 +13,12 @@ export const BlocksPage = () => {
   const [blockColor, setBlockColor] = useState("#4285F4");
   const [isSettingsMinimized, setIsSettingsMinimized] = useState(false);
   const [blocksPerRow, setBlocksPerRow] = useState(20);
-  const [backgroundColor, setBackgroundColor] = useState("#000000");
+  const [backgroundColor, setBackgroundColor] = useState("#FFFFFF");
   const [isMouseVisible, setIsMouseVisible] = useState(true);
   const [isPaintMode, setIsPaintMode] = useState(false);
   const [randomSpeed, setRandomSpeed] = useState(1000);
   const [isMouseDown, setIsMouseDown] = useState(false);
+  const [showGrid, setShowGrid] = useState(true);
 
   const toggleSettingsMinimize = (event: KeyboardEvent) => {
     if (event.key.toLowerCase() === "s") {
@@ -126,6 +127,8 @@ export const BlocksPage = () => {
       );
 
       setActiveBlocks(clearedBlocks);
+    } else if (event.key === "g" || event.key === "G") {
+      setShowGrid(!showGrid);
     }
   };
 
@@ -225,6 +228,7 @@ export const BlocksPage = () => {
             onMouseEnter={handleMouseEnter}
             onMouseClick={handleBlockClick}
             backgroundColor={backgroundColor}
+            showGrid={showGrid}
           />
         ))}
       </div>
@@ -241,6 +245,7 @@ type BlockProps = {
   onMouseEnter: (index: number) => void;
   onMouseClick: (index: number) => void;
   backgroundColor: string;
+  showGrid: boolean;
 };
 
 const Block = ({
@@ -252,6 +257,7 @@ const Block = ({
   onMouseEnter,
   onMouseClick,
   backgroundColor,
+  showGrid,
 }: BlockProps) => {
   const isActive = activeBlocks[index];
   const isRightBlockActive = activeBlocks[index + 1];
@@ -341,6 +347,20 @@ const Block = ({
         backgroundColor: outerBackgroundColor,
       }}
     >
+      {showGrid && (
+        <div
+          style={{
+            backgroundColor: "transparent",
+            border:
+              outerBackgroundColor === "#000000"
+                ? "1px solid rgba(255, 255, 255, 0.2)"
+                : "1px solid rgba(0, 0, 0, 0.2)",
+            width: "100%",
+            height: "100%",
+            position: "absolute",
+          }}
+        ></div>
+      )}
       <div
         style={{
           backgroundColor: innerBackgroundColor,
@@ -506,6 +526,7 @@ const SettingsPanel = ({
       )}
       <div className={styles.miniText}>
         <div className={styles.minimizedText}>Toggle menu with "S" button</div>
+        <div className={styles.minimizedText}>Toggle grid with "G" button</div>
         {isPaintMode && (
           <>
             <div className={styles.minimizedText}>
