@@ -20,12 +20,6 @@ export const BlocksPage = () => {
   const [isMouseDown, setIsMouseDown] = useState(false);
   const [showGrid, setShowGrid] = useState(true);
 
-  const toggleSettingsMinimize = (event: KeyboardEvent) => {
-    if (event.key.toLowerCase() === "s") {
-      setIsSettingsMinimized((prev) => !prev);
-    }
-  };
-
   const handleMouseDown = () => {
     if (isPaintMode) {
       setIsMouseDown(true);
@@ -38,7 +32,12 @@ export const BlocksPage = () => {
 
   const handleMouseEnter = (index: number) => {
     if (isPaintMode && isMouseDown) {
-      setActiveBlocks((prev) => ({ ...prev, [index]: true }));
+      setActiveBlocks((prev) => {
+        const newBlocks = { ...prev };
+        // Toggle the block's active state
+        newBlocks[index] = !prev[index];
+        return newBlocks;
+      });
     }
     if (!isPaintMode) {
       setActiveBlocks((prev) => ({ ...prev, [index]: true }));
@@ -54,7 +53,6 @@ export const BlocksPage = () => {
       newActiveBlocks[index] = true;
     });
     setActiveBlocks(newActiveBlocks);
-    setIsSettingsMinimized(true);
     setIsPaintMode(true);
 
     Object.keys(newActiveBlocks).forEach((key) => {
@@ -82,69 +80,109 @@ export const BlocksPage = () => {
     const maxDelay = 3000 + randomSpeed; // Adjust this based on your dissolve style timing
     setTimeout(() => {
       setIsPaintMode(false);
-      setIsSettingsMinimized(false);
     }, maxDelay);
   };
 
-  const handleEscPress = (event: KeyboardEvent) => {
-    if (event.key === "Escape" && isPaintMode) {
-      const activeBlockIndices = Object.keys(activeBlocks)
-        .filter((key: any) => activeBlocks[key])
-        .map((key) => parseInt(key));
+  const handleButtonCommand = (event: KeyboardEvent) => {
+    switch (event.key.toLowerCase()) {
+      case "d":
+        // Logic for "D" key command
+        console.log("'D' button pressed");
+        randomiseBlocks();
+        break;
 
-      let longestTimeoutDuration = 0;
-
-      // Shuffle the indices array
-      activeBlockIndices.sort(() => Math.random() - 0.5);
-
-      // Disappear blocks with random timing and track the longest duration
-      activeBlockIndices.forEach((index) => {
-        const timeoutDuration = 200 + Math.random() * 500;
-        longestTimeoutDuration = Math.max(
-          longestTimeoutDuration,
-          timeoutDuration
-        );
-
-        setTimeout(() => {
-          setActiveBlocks((prev) => ({ ...prev, [index.toString()]: false }));
-        }, timeoutDuration);
-      });
-
-      // Restore blocks after the last one has disappeared plus 3 seconds
-      setTimeout(() => {
-        activeBlockIndices.forEach((index) => {
-          setActiveBlocks((prev) => ({ ...prev, [index.toString()]: true }));
-        });
-      }, longestTimeoutDuration + 1500);
-    } else if (isPaintMode && (event.key === "C" || event.key === "c")) {
-      // Clear all blocks immediately without animation
-      const clearedBlocks = Object.keys(activeBlocks).reduce(
-        (acc, key: any) => {
-          acc[key] = false;
+      case "f":
+        // Activate all blocks and toggle paint mode
+        const allActiveBlocks = blocksArray.reduce((acc, _, index) => {
+          acc[index] = true;
           return acc;
-        },
-        {} as Record<number, boolean>
-      );
+        }, {});
+        setActiveBlocks(allActiveBlocks);
+        setIsPaintMode(true);
+        console.log(
+          "'F' button pressed, all blocks activated, paint mode toggled"
+        );
+        break;
 
-      setActiveBlocks(clearedBlocks);
-    } else if (event.key === "g" || event.key === "G") {
-      setShowGrid(!showGrid);
+      case "s":
+        // Toggle settings panel
+        setIsSettingsMinimized((prev) => !prev);
+        break;
+
+      case "g":
+        // Toggle settings panel
+        setShowGrid((prev) => !prev);
+        break;
+      case "c":
+        // Toggle settings panel
+        if (isPaintMode) {
+          // Clear all blocks immediately without animation
+          const clearedBlocks = Object.keys(activeBlocks).reduce(
+            (acc, key: any) => {
+              acc[key] = false;
+              return acc;
+            },
+            {} as Record<number, boolean>
+          );
+
+          setActiveBlocks(clearedBlocks);
+        }
+
+        break;
+
+      case "escape":
+        if (isPaintMode) {
+          const activeBlockIndices = Object.keys(activeBlocks)
+            .filter((key: any) => activeBlocks[key])
+            .map((key) => parseInt(key));
+
+          let longestTimeoutDuration = 0;
+
+          // Shuffle the indices array
+          activeBlockIndices.sort(() => Math.random() - 0.5);
+
+          // Disappear blocks with random timing and track the longest duration
+          activeBlockIndices.forEach((index) => {
+            const timeoutDuration = 200 + Math.random() * 500;
+            longestTimeoutDuration = Math.max(
+              longestTimeoutDuration,
+              timeoutDuration
+            );
+
+            setTimeout(() => {
+              setActiveBlocks((prev) => ({
+                ...prev,
+                [index.toString()]: false,
+              }));
+            }, timeoutDuration);
+          });
+
+          // Restore blocks after the last one has disappeared plus 3 seconds
+          setTimeout(() => {
+            activeBlockIndices.forEach((index) => {
+              setActiveBlocks((prev) => ({
+                ...prev,
+                [index.toString()]: true,
+              }));
+            });
+          }, longestTimeoutDuration + 1500);
+        }
+        break;
+
+      // Add additional key cases if needed
+
+      default:
+        // Handle any other keys or default case
+        break;
     }
   };
 
   useEffect(() => {
-    window.addEventListener("keydown", handleEscPress);
+    window.addEventListener("keydown", handleButtonCommand);
     return () => {
-      window.removeEventListener("keydown", handleEscPress);
+      window.removeEventListener("keydown", handleButtonCommand);
     };
   }, [activeBlocks, isPaintMode, randomSpeed]);
-
-  useEffect(() => {
-    window.addEventListener("keydown", toggleSettingsMinimize);
-    return () => {
-      window.removeEventListener("keydown", toggleSettingsMinimize);
-    };
-  }, []);
 
   useEffect(() => {
     window.addEventListener("mousedown", handleMouseDown);
