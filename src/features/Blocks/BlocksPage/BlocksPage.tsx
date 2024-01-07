@@ -4,16 +4,17 @@ import React, { useEffect, useState } from "react";
 import styles from "./BlocksPage.module.css";
 import { ColorSelect } from "../../../components/ColorSelect";
 import { pztColors } from "../../../store/store";
+import { useBlocksStore } from "./useBlocksStore";
 
 export const BlocksPage = () => {
-  const [dissolveStyle, setDissolveStyle] = useState("Random");
+  const { dissolveStyle, isSettingsMinimized, setIsSettingsMinimized } =
+    useBlocksStore();
+
   const [brv, setBorderRadiusValue] = useState(20);
   const [timeoutDuration, setTimeoutDuration] = useState(700);
   const [activeBlocks, setActiveBlocks] = useState<Record<number, boolean>>({});
   const [blockColor, setBlockColor] = useState("#4285F4");
-  const [isSettingsMinimized, setIsSettingsMinimized] = useState(false);
   const [blocksPerRow, setBlocksPerRow] = useState(20);
-  const [backgroundColor, setBackgroundColor] = useState("#FFFFFF");
   const [isMouseVisible, setIsMouseVisible] = useState(true);
   const [isPaintMode, setIsPaintMode] = useState(false);
   const [randomSpeed, setRandomSpeed] = useState(1000);
@@ -53,7 +54,6 @@ export const BlocksPage = () => {
       newActiveBlocks[index] = true;
     });
     setActiveBlocks(newActiveBlocks);
-    setIsPaintMode(true);
 
     Object.keys(newActiveBlocks).forEach((key) => {
       const index = parseInt(key);
@@ -75,12 +75,6 @@ export const BlocksPage = () => {
         setActiveBlocks((prev) => ({ ...prev, [index]: false }));
       }, delay);
     });
-
-    // Reset blocks after the longest possible delay
-    const maxDelay = 3000 + randomSpeed; // Adjust this based on your dissolve style timing
-    setTimeout(() => {
-      setIsPaintMode(false);
-    }, maxDelay);
   };
 
   const handleButtonCommand = (event: KeyboardEvent) => {
@@ -106,7 +100,7 @@ export const BlocksPage = () => {
 
       case "s":
         // Toggle settings panel
-        setIsSettingsMinimized((prev) => !prev);
+        setIsSettingsMinimized(!isSettingsMinimized);
         break;
 
       case "g":
@@ -229,24 +223,19 @@ export const BlocksPage = () => {
       }}
     >
       <SettingsPanel
-        setBackgroundColor={setBackgroundColor}
         brv={brv}
         setBorderRadiusValue={setBorderRadiusValue}
         timeoutDuration={timeoutDuration}
         setTimeoutDuration={setTimeoutDuration}
         blockColor={blockColor}
         setBlockColor={setBlockColor}
-        isMinimized={isSettingsMinimized}
         blocksPerRow={blocksPerRow}
         setBlocksPerRow={setBlocksPerRow}
-        backgroundColor={backgroundColor}
         isMouseVisible={isMouseVisible}
         setIsMouseVisible={setIsMouseVisible}
         isPaintMode={isPaintMode}
         setIsPaintMode={setIsPaintMode}
         onRandomiseClick={randomiseBlocks}
-        dissolveStyle={dissolveStyle}
-        setDissolveStyle={setDissolveStyle}
       />
       <div
         className={styles.container}
@@ -265,7 +254,6 @@ export const BlocksPage = () => {
             activeBlocks={activeBlocks}
             onMouseEnter={handleMouseEnter}
             onMouseClick={handleBlockClick}
-            backgroundColor={backgroundColor}
             showGrid={showGrid}
           />
         ))}
@@ -282,7 +270,6 @@ type BlockProps = {
   activeBlocks: Record<number, boolean>;
   onMouseEnter: (index: number) => void;
   onMouseClick: (index: number) => void;
-  backgroundColor: string;
   showGrid: boolean;
 };
 
@@ -294,9 +281,10 @@ const Block = ({
   activeBlocks,
   onMouseEnter,
   onMouseClick,
-  backgroundColor,
   showGrid,
 }: BlockProps) => {
+  const { backgroundColor } = useBlocksStore();
+
   const isActive = activeBlocks[index];
   const isRightBlockActive = activeBlocks[index + 1];
   const isLeftBlockActive = activeBlocks[index - 1];
@@ -418,8 +406,6 @@ const SettingsPanel = ({
   setTimeoutDuration,
   blockColor,
   setBlockColor,
-  isMinimized,
-  setBackgroundColor,
   blocksPerRow,
   setBlocksPerRow,
   isMouseVisible,
@@ -427,10 +413,15 @@ const SettingsPanel = ({
   isPaintMode,
   setIsPaintMode,
   onRandomiseClick,
-  backgroundColor,
-  dissolveStyle,
-  setDissolveStyle,
 }: any) => {
+  const {
+    isSettingsMinimized: isMinimized,
+    backgroundColor,
+    setBackgroundColor,
+    dissolveStyle,
+    setDissolveStyle,
+  } = useBlocksStore();
+
   return (
     <div
       className={`${styles.settingsPanel} ${
@@ -565,6 +556,10 @@ const SettingsPanel = ({
       <div className={styles.miniText}>
         <div className={styles.minimizedText}>Toggle menu with "S" button</div>
         <div className={styles.minimizedText}>Toggle grid with "G" button</div>
+        <div className={styles.minimizedText}>Fill screen with "F" button</div>
+        <div className={styles.minimizedText}>
+          Dissolve screen with "D" button
+        </div>
         {isPaintMode && (
           <>
             <div className={styles.minimizedText}>
