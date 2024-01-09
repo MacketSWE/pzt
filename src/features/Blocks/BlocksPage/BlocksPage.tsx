@@ -7,8 +7,13 @@ import { pztColors } from "../../../store/store";
 import { useBlocksStore } from "./useBlocksStore";
 
 export const BlocksPage = () => {
-  const { dissolveStyle, isSettingsMinimized, setIsSettingsMinimized } =
-    useBlocksStore();
+  const {
+    dissolveStyle,
+    isSettingsMinimized,
+    setIsSettingsMinimized,
+    drawOrErase,
+    setDrawOrErase,
+  } = useBlocksStore();
 
   const [brv, setBorderRadiusValue] = useState(20);
   const [timeoutDuration, setTimeoutDuration] = useState(700);
@@ -35,8 +40,11 @@ export const BlocksPage = () => {
     if (isPaintMode && isMouseDown) {
       setActiveBlocks((prev) => {
         const newBlocks = { ...prev };
-        // Toggle the block's active state
-        newBlocks[index] = !prev[index];
+        if (drawOrErase === "draw" && !prev[index]) {
+          newBlocks[index] = true;
+        } else if (drawOrErase === "erase" && prev[index]) {
+          newBlocks[index] = false;
+        }
         return newBlocks;
       });
     }
@@ -83,6 +91,16 @@ export const BlocksPage = () => {
         // Logic for "D" key command
         console.log("'D' button pressed");
         randomiseBlocks();
+        break;
+      case "1":
+        // Logic for "D" key command
+        console.log("'1' button pressed");
+        setDrawOrErase("draw");
+        break;
+      case "2":
+        // Logic for "D" key command
+        console.log("'2' button pressed");
+        setDrawOrErase("erase");
         break;
 
       case "f":
@@ -420,6 +438,8 @@ const SettingsPanel = ({
     setBackgroundColor,
     dissolveStyle,
     setDissolveStyle,
+    setDrawOrErase,
+    drawOrErase,
   } = useBlocksStore();
 
   return (
@@ -476,6 +496,33 @@ const SettingsPanel = ({
               checked={isPaintMode}
               onChange={() => setIsPaintMode((prev: any) => !prev)}
             />
+          </div>
+          <div>
+            <div className={styles.settingItem}>
+              <label>Draw or Erase: </label>
+              <div>
+                <div>
+                  <input
+                    type="radio"
+                    value="draw"
+                    name="drawOrErase"
+                    checked={drawOrErase === "draw"}
+                    onChange={() => setDrawOrErase("draw")}
+                  />{" "}
+                  Draw
+                </div>
+                <div>
+                  <input
+                    type="radio"
+                    value="erase"
+                    name="drawOrErase"
+                    checked={drawOrErase === "erase"}
+                    onChange={() => setDrawOrErase("erase")}
+                  />{" "}
+                  Erase
+                </div>
+              </div>
+            </div>
           </div>
           <div className={styles.settingItem}>
             <label>Show Mouse Pointer: </label>
