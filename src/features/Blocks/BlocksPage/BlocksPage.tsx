@@ -21,7 +21,7 @@ export const BlocksPage = () => {
   const [blockColor, setBlockColor] = useState("#4285F4");
   const [blocksPerRow, setBlocksPerRow] = useState(20);
   const [isMouseVisible, setIsMouseVisible] = useState(true);
-  const [isPaintMode, setIsPaintMode] = useState(false);
+  const [isPaintMode, setIsPaintMode] = useState(true);
   const [randomSpeed, setRandomSpeed] = useState(1000);
   const [isMouseDown, setIsMouseDown] = useState(false);
   const [showGrid, setShowGrid] = useState(true);
@@ -536,7 +536,7 @@ const SettingsPanel = ({
                     checked={drawOrErase === "draw"}
                     onChange={() => setDrawOrErase("draw")}
                   />{" "}
-                  Draw
+                  Draw (1)
                 </div>
                 <div>
                   <input
@@ -546,7 +546,7 @@ const SettingsPanel = ({
                     checked={drawOrErase === "erase"}
                     onChange={() => setDrawOrErase("erase")}
                   />{" "}
-                  Erase
+                  Erase (2)
                 </div>
               </div>
             </div>
