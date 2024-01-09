@@ -77,6 +77,13 @@ export const BlocksPage = () => {
         const totalRows = Math.ceil(blocksArray.length / blocksPerRow);
         const rowIndex = totalRows - Math.floor(index / blocksPerRow);
         delay = rowIndex * (100 + Math.random() * 50);
+      } else if (dissolveStyle === "Left-Right") {
+        const columnIndex = (index % blocksPerRow) + 1;
+        delay = columnIndex * (100 + Math.random() * 50) + 200;
+      } else if (dissolveStyle === "Right-Left") {
+        const totalColumns = blocksPerRow;
+        const columnIndex = totalColumns - (index % blocksPerRow);
+        delay = columnIndex * (100 + Math.random() * 50) + 200;
       }
 
       setTimeout(() => {
@@ -485,6 +492,26 @@ const SettingsPanel = ({
                   onChange={() => setDissolveStyle("Down-Top")}
                 />{" "}
                 Down-Top
+              </div>
+              <div>
+                <input
+                  type="radio"
+                  value="Left-Right"
+                  name="dissolveStyle"
+                  checked={dissolveStyle === "Left-Right"}
+                  onChange={() => setDissolveStyle("Left-Right")}
+                />{" "}
+                Left-Right
+              </div>
+              <div>
+                <input
+                  type="radio"
+                  value="Right-Left"
+                  name="dissolveStyle"
+                  checked={dissolveStyle === "Right-Left"}
+                  onChange={() => setDissolveStyle("Right-Left")}
+                />{" "}
+                Right-Left
               </div>
             </div>
           </div>
