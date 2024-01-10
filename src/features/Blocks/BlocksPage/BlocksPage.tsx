@@ -70,22 +70,24 @@ export const BlocksPage = () => {
       let delay;
 
       if (dissolveStyle === "Random") {
-        delay = 200 + Math.random() * randomSpeed;
+        delay = 200 + Math.random() * (timeoutDuration / 5 + 1000);
       } else if (dissolveStyle === "Top-Down") {
         const rowIndex = Math.floor(index / blocksPerRow) + 1;
-        delay = rowIndex * (100 + Math.random() * 50) + 200;
+        delay = rowIndex * (100 + Math.random() * (timeoutDuration / 10)) + 200;
         console.log(rowIndex, delay);
       } else if (dissolveStyle === "Down-Top") {
         const totalRows = Math.ceil(blocksArray.length / blocksPerRow);
         const rowIndex = totalRows - Math.floor(index / blocksPerRow);
-        delay = rowIndex * (100 + Math.random() * 50);
+        delay = rowIndex * (100 + Math.random() * (timeoutDuration / 10));
       } else if (dissolveStyle === "Left-Right") {
         const columnIndex = (index % blocksPerRow) + 1;
-        delay = columnIndex * (100 + Math.random() * 50) + 200;
+        delay =
+          columnIndex * (100 + Math.random() * (timeoutDuration / 10)) + 200;
       } else if (dissolveStyle === "Right-Left") {
         const totalColumns = blocksPerRow;
         const columnIndex = totalColumns - (index % blocksPerRow);
-        delay = columnIndex * (100 + Math.random() * 50) + 200;
+        delay =
+          columnIndex * (100 + Math.random() * (timeoutDuration / 10)) + 200;
       }
 
       setTimeout(() => {
