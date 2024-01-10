@@ -4,8 +4,8 @@ type State = {
   backgroundColor: string;
   dissolveStyle: string;
   isSettingsMinimized: boolean;
-  drawOrErase: "draw" | "erase";
-  setDrawOrErase: (mode: "draw" | "erase") => void;
+  drawOrErase: "draw" | "erase" | "both";
+  setDrawOrErase: (mode: "draw" | "erase" | "both") => void;
   setIsSettingsMinimized: (isMinimized: any) => void;
   setDissolveStyle: (style: string) => void;
   setBackgroundColor: (color: string) => void;

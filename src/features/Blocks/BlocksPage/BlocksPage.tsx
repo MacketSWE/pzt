@@ -44,6 +44,8 @@ export const BlocksPage = () => {
           newBlocks[index] = true;
         } else if (drawOrErase === "erase" && prev[index]) {
           newBlocks[index] = false;
+        } else if (drawOrErase === "both") {
+          newBlocks[index] = !prev[index];
         }
         return newBlocks;
       });
@@ -108,6 +110,11 @@ export const BlocksPage = () => {
         // Logic for "D" key command
         console.log("'2' button pressed");
         setDrawOrErase("erase");
+        break;
+      case "3":
+        // Logic for "D" key command
+        console.log("'3' button pressed");
+        setDrawOrErase("both");
         break;
 
       case "f":
@@ -547,6 +554,16 @@ const SettingsPanel = ({
                     onChange={() => setDrawOrErase("erase")}
                   />{" "}
                   Erase (2)
+                </div>
+                <div>
+                  <input
+                    type="radio"
+                    value="erase"
+                    name="drawOrErase"
+                    checked={drawOrErase === "both"}
+                    onChange={() => setDrawOrErase("both")}
+                  />{" "}
+                  Both (3)
                 </div>
               </div>
             </div>
